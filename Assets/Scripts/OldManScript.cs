@@ -8,7 +8,7 @@ using UnityEngine;
 public class OldManScript : MonoBehaviour
 {
     private const float MOVE_COOLDOWN = 5;
-    private const float MOVE_SPEED = 10;
+    private const float MOVE_SPEED = 3;
 
     private float moveCooldownLeft = 0;
     private Animator animator;
