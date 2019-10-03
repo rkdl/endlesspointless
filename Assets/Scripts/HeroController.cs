@@ -1,25 +1,42 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using UnityEngine;
 using UnityEngine.Animations;
 
 public class HeroController : MonoBehaviour
 {
-    private const float MOVE_SPEED = 10;
+    public float moveSpeed = 1;
+    public float crouchSpeed = 0.5f;
+    public LayerMask whatIsGround;
 
     private Animator animator;
+    private Rigidbody2D rigidbody;
     private float horizontalMove = 0;
+    private bool isCrouching = false;
+    private bool isJumping = false;
+    private bool isGrounded = false;
 
     private void Start()
     {
         animator = GetComponent<Animator>();
+        rigidbody = GetComponent<Rigidbody2D>();
+    }
+
+    private void ReadInputs()
+    {
+        horizontalMove = Input.GetAxisRaw("Horizontal") * moveSpeed;
+        isCrouching = Input.GetAxisRaw("Vertical") < 0;
+        isJumping = Input.GetButtonDown("Jump");
+
+        animator.SetBool("isMoving", Mathf.Abs(horizontalMove) > 0);
+        animator.SetBool("isCrouching", isCrouching);
+        animator.SetBool("isJumping", isJumping);
     }
 
     private void Update()
     {
-        horizontalMove = Input.GetAxisRaw("Horizontal") * Time.fixedDeltaTime * MOVE_SPEED;
-
-        animator.SetBool("isMoving", Mathf.Abs(horizontalMove) > 0);
+        ReadInputs();
 
         var isFacingRight = Mathf.Approximately(transform.localEulerAngles.y, 0);
         var isFacingLeft = !isFacingRight;
@@ -33,7 +50,8 @@ public class HeroController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        var previousPosition = transform.position;
-        transform.position = new Vector2(previousPosition.x + horizontalMove, previousPosition.y);
+        var baseSpeed = isCrouching ? crouchSpeed : moveSpeed;
+        isGrounded = rigidbody.IsTouchingLayers(whatIsGround);
+        rigidbody.velocity = new Vector2(baseSpeed * horizontalMove, rigidbody.velocity.y);
     }
 }
