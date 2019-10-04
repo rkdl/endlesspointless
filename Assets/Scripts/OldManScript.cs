@@ -3,12 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 
 public class OldManScript : MonoBehaviour
 {
-    private const float MOVE_COOLDOWN = 5;
-    private const float MOVE_SPEED = 3;
+    public float moveCooldown = 5;
+    public float moveSpeed = 2;
 
     private float moveCooldownLeft = 0;
     private Animator animator;
@@ -37,7 +38,7 @@ public class OldManScript : MonoBehaviour
 
         if (isDestinationReached)
         {
-            moveCooldownLeft = MOVE_COOLDOWN;
+            moveCooldownLeft = moveCooldown;
             var prevDest = destination;
             destination = startPosition;
             startPosition = prevDest;
@@ -60,6 +61,6 @@ public class OldManScript : MonoBehaviour
         }
 
         transform.position = Vector3.MoveTowards(
-            transform.position, destination, Time.deltaTime * MOVE_SPEED);
+            transform.position, destination, Time.deltaTime * moveSpeed);
     }
 }
