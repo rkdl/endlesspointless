@@ -54,3 +54,6 @@ sysinfo.txt
 crashlytics-build.properties
 
 .idea
+
+# build
+Dist/

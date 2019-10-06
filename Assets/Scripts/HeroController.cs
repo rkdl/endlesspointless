@@ -16,6 +16,8 @@ public class HeroController : MonoBehaviour
     private Animator animator;
     private new Rigidbody2D rigidbody2D;
     private CircleCollider2D groundCollider;
+    // 100 definitely should be enough for ground collisions
+    private Collider2D[] overlappingCollidersBuffer = new Collider2D[100];
     private float horizontalMove = 0;
     private bool isCrouching = false;
     private bool jumpPressed = false;
@@ -55,9 +57,20 @@ public class HeroController : MonoBehaviour
 
     private bool IsGrounded()
     {
-        var overlappingColliders = Physics2D.OverlapCircleAll(
-            groundCollider.bounds.center, groundCollider.radius + 0.3f, whatIsGround);
-        return overlappingColliders.Any(col => col != groundCollider);
+        var size = Physics2D.OverlapCircleNonAlloc(
+            groundCollider.bounds.center, 
+            groundCollider.radius + 0.3f, 
+            overlappingCollidersBuffer, 
+            whatIsGround);
+
+        for (var index = 0; index < size; index++)
+        {
+            if (overlappingCollidersBuffer[index] != groundCollider)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void FixedUpdate()
