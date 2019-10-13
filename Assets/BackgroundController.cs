@@ -3,21 +3,42 @@ using System.Collections.Generic;
 using System.Transactions;
 using UnityEngine;
 
+enum MoveDirection
+{
+    Left = -1,
+    Right = 1,
+}
+
 public class BackgroundController : MonoBehaviour
 {
     public float moveMultiplier = 0.25f;
-
+    public float backgroundRepositionDelta = 0.1f;
+    public GameObject background;
+    public GameObject middleground;
+    
+    private GameObject helpingBackground;
+    private float backgroundHalfWidth;
+    
     private readonly Vector2 backgroundMoveDirection = new Vector2(1, -1);
     private Vector2 previousCameraPosition;
     private Camera mainCamera;
-    private Sprite sprite;
-    
-    private Vector2 screenBounds;
+
     void Start()
     {
         mainCamera = Camera.main;
-        sprite = GetComponent<Sprite>();
         previousCameraPosition = mainCamera.transform.position;
+
+        var backgroundRenderer = background.GetComponent<Renderer>();
+        backgroundHalfWidth = backgroundRenderer.bounds.extents.x;
+
+        var currentBkgPosition = background.transform.position;
+        var bkgSpriteWidth = backgroundHalfWidth * 2;
+        
+        helpingBackground = Instantiate(
+            background, 
+            new Vector2(currentBkgPosition.x - bkgSpriteWidth, currentBkgPosition.y), 
+            background.transform.rotation);
+        helpingBackground.transform.parent = background.transform.parent;
     }
 
     void Update()
@@ -28,26 +49,38 @@ public class BackgroundController : MonoBehaviour
             (currentCameraPosition - previousCameraPosition) *
             backgroundMoveDirection * 
             moveMultiplier;
-        transform.Translate(backgroundTranslation);
+
+        previousCameraPosition = currentCameraPosition;
+
+        background.transform.Translate(backgroundTranslation);
+        helpingBackground.transform.Translate(backgroundTranslation);
 
         var halfCamWidth = mainCamera.aspect * mainCamera.orthographicSize;
         var camLeftXBound = currentCameraPosition.x - halfCamWidth;
         var camRightXBound = currentCameraPosition.x + halfCamWidth;
-
-        previousCameraPosition = mainCamera.transform.position;
-        
-        var renderer = GetComponent<Renderer>();
-
-        var spriteLeftXBound = renderer.transform.position.x - renderer.bounds.extents.x;
-        var spriteRightXBound = renderer.transform.position.x + renderer.bounds.extents.x;
-        var delta = 0.1f;
-        if (camRightXBound + delta > spriteRightXBound)
+        var spriteLeftXBound = background.transform.position.x - backgroundHalfWidth;
+        var spriteRightXBound = background.transform.position.x + backgroundHalfWidth;
+        if (camRightXBound + backgroundRepositionDelta > spriteRightXBound)
         {
-            // need to spawn texture right
+            RepositionBackground(MoveDirection.Right);
         }
-        else if (camLeftXBound - delta < spriteLeftXBound)
+        else if (camLeftXBound - backgroundRepositionDelta < spriteLeftXBound)
         {
-            // spawn texture left
+            RepositionBackground(MoveDirection.Left);
         }
+    }
+
+    private void RepositionBackground(MoveDirection direction)
+    {
+        var currentBkgPosition = background.transform.position;
+        var bkgSpriteWidth = backgroundHalfWidth * 2;
+
+        helpingBackground.transform.position = new Vector2(
+            currentBkgPosition.x + bkgSpriteWidth * (int)direction, 
+            helpingBackground.transform.position.y);
+
+        var temp = background;
+        background = helpingBackground;
+        helpingBackground = temp;
     }
 }
