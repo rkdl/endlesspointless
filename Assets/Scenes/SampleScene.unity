@@ -1617,7 +1617,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09f14f1f76453e046b9982511dac80e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveMultiplier: 0.25
+  backgroundFollowMultiplier: 0.8
+  middlegroundFollowMultiplier: 0.5
+  repositionDelta: 0.1
   background: {fileID: 206906666}
   middleground: {fileID: 573291713}
 --- !u!1 &1500193535
