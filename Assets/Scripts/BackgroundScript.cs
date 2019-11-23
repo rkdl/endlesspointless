@@ -2,7 +2,7 @@
 
 public class BackgroundScript : MonoBehaviour
 {
-    public float backgroundFollowMultiplier = 0.25f;
+    public float backgroundFollowMultiplier = 0.75f;
     public float middlegroundFollowMultiplier = 0.5f;
     public float repositionDelta = 0.1f;
     public GameObject background;
